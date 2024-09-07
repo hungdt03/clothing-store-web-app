@@ -1,0 +1,83 @@
+@import url('https://fonts.googleapis.com/css2?family=Josefin+Sans:ital,wght@0,100..700;1,100..700&display=swap');
+
+:root {
+    font-family: "Josefin Sans", sans-serif, serif !important;
+    /* font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif; */
+    line-height: 1.5;
+    font-weight: 400;
+
+    font-synthesis: none;
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+
+
+/* Override dots of ant design - CAROUSEL */
+
+.ant-carousel .slick-dots li button {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background-color: #fff;
+    opacity: 1;
+}
+
+.ant-carousel .slick-dots li {
+    margin-bottom: 24px;
+}
+
+
+.ant-carousel .slick-dots li.slick-active {
+    width: 16px;
+
+}
+
+.ant-carousel .slick-dots li.slick-active button::before {
+    content: '';
+    position: absolute;
+    top: -5px;
+    left: -5px;
+    width: 18px;
+    height: 18px;
+    border: 2px solid white;
+    border-radius: 50%;
+    background-color: transparent;
+    z-index: 0;
+}
+
+/* End Override dots of ant design - CAROUSEL */
+
+/* Override segmented Item */
+
+.ant-segmented-item {
+    border-radius: 1000000px;
+}
+
+body {
+    margin: 0;
+
+}
+
+.scrollbar-w-2::-webkit-scrollbar {
+    width: 2px;
+    /* Độ rộng của thanh cuộn */
+}
+
+.custom-scrollbar::-webkit-scrollbar {
+    width: 5px;
+}
+
+.scrollbar-h-4::-webkit-scrollbar {
+    height: 10px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+    background-color: #e8eaec;
+    border-radius: 1000px;
+}
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;

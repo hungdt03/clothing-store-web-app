@@ -1,0 +1,37 @@
+import { Avatar } from "antd";
+import { FC } from "react";
+import images from "../../../assets";
+import { UserContactResource } from "../../../resources";
+import { formatTimeTypeAgo } from "../../../utils/format";
+
+type ChatUserItemProps = {
+    group: UserContactResource;
+    onClick: () => void
+}
+
+const ChatUserItem: FC<ChatUserItemProps> = ({
+    group,
+    onClick
+}) => {
+    return <div onClick={onClick} className="cursor-pointer flex items-center gap-x-2 hover:bg-gray-100 p-2 rounded-md">
+
+        <div className="relative">
+            <Avatar
+                src={images.demoMenth}
+                size='large'
+            />
+            {group.user.isOnline && <span className="absolute bottom-0 right-1 w-[12px] h-[12px] rounded-full border-2 border-white bg-green-500"></span>}
+        </div>
+
+        <div className="flex flex-col flex-1">
+            <b>{group.user.name}</b>
+            <div className="flex items-center justify-between text-[14px] gap-x-2">
+                <p className="w-32 truncate">{group.message.content}</p>
+                <span className="text-sky-600">{group.message.sentAt ? formatTimeTypeAgo(new Date(group.message.sentAt)) : 'Chưa kết nối'}</span>
+            </div>
+
+        </div>
+    </div>
+};
+
+export default ChatUserItem;

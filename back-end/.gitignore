@@ -1,0 +1,7 @@
+# Ignore Firebase Service Account
+firebase-service-account.json
+
+# Ignore .NET build output folders
+bin/
+obj/
+.vs/
