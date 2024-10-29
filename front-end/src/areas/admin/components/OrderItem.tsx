@@ -3,6 +3,7 @@ import { FC } from "react";
 
 import { OrderItemResource } from "../../../resources";
 import { formatCurrencyVND } from "../../../utils/format";
+import images from "../../../assets";
 
 type OrderItemProps = {
     orderItem: OrderItemResource
@@ -13,7 +14,9 @@ const OrderItem: FC<OrderItemProps> = ({
 }) => {
     return <div className="flex justify-between items-center">
         <div className="flex gap-x-2 items-center">
-            <Image className="rounded-md object-cover" width='80px' height='80px' src={orderItem.variant?.thumbnailUrl} />
+            <Image onError={(e) => {
+                e.currentTarget.src = images.demoMenth;
+            }} className="rounded-md object-cover" width='80px' height='80px' src={orderItem.variant?.thumbnailUrl} />
             <div className="flex text-sm flex-col gap-y-2">
                 <span className="font-semibold text-[16px]">{orderItem.productName}</span>
                 <div className="flex gap-x-3">

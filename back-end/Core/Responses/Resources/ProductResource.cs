@@ -7,6 +7,7 @@
         public string Description { get; set; }
         public double OldPrice { get; set; }
         public double Price { get; set; }
+        public double PurchasePrice { get; set; }
         public int Quantity { get; set; }
         public CategoryResource Category { get; set; }
         public BrandResource Brand { get; set; }

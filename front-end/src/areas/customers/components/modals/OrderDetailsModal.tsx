@@ -36,7 +36,7 @@ const OrderDetailsModal: FC<OrderDetailsModalProps> = ({
         fetchOrder();
     }, [orderId])
 
-    return <div className="flex flex-col">
+    return <div className="flex flex-col max-h-[500px] overflow-y-auto custom-scrollbar scrollbar-h-4 px-4">
         <div className="text-lg">
             <Divider orientation="left" plain>
                 <span className="text-[16px]">Tiến trình</span>

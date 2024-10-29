@@ -13,7 +13,7 @@ namespace back_end.Services.Interfaces
         Task UploadImages(int id, List<IFormFile> files);
         Task RemoveImages(List<int> ids);
         Task RemoveVariant(int id);
-        Task<BaseResponse> GetAllVariantsByProductId(int productId);
+        Task<BaseResponse> GetAllVariantsByProductId(int productId, int pageIndex, int pageSize, string searchString);
         Task<BaseResponse> GetAllVariantsByProductIdAndColorId(int productId, int colorId);
         Task<BaseResponse> GetUniqueColorVariantsByProductId(int productId);
         Task<BaseResponse> GetUniqueSizeVariantsByProductId(int productId);

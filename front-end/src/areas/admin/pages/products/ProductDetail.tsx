@@ -21,6 +21,7 @@ import CheckBoxImage from "../../components/CheckBoxImage";
 import ReactApexChart from "react-apexcharts";
 import { getBase64 } from "../../../../utils/file";
 import UploadButton from "../../components/UploadButton";
+import VariantManagement from "./VariantManagement";
 
 
 type FileType = Parameters<GetProp<UploadProps, 'beforeUpload'>>[0];
@@ -140,7 +141,7 @@ const ProductDetail: FC = () => {
     }
 
 
-    return <div className="grid grid-cols-12 gap-6 h-full overflow-hidden">
+    return <div className="grid grid-cols-12 gap-6 h-full">
         <div className="col-span-8 flex flex-col gap-y-6 relative h-full overflow-y-auto custom-scrollbar scrollbar-h-4">
             <div className="bg-white shadow-sm rounded-lg p-6 grid grid-cols-12 gap-x-6">
                 <div className="col-span-6 flex flex-col gap-y-4">
@@ -184,9 +185,20 @@ const ProductDetail: FC = () => {
                         <span className="text-lg">Thể loại: <b>{product?.category.name}</b></span>
                         <span className="text-lg">Thương hiệu: <b>{product?.brand.name}</b></span>
                     </div>
-                    <p className="text-lg">{product?.description}</p>
 
                     <div className="flex gap-x-3 items-center">
+                        <span className="text-lg flex-1">Mô tả: </span>
+                        <p className="text-lg">{product?.description}</p>
+                    </div>
+                    
+
+                    <div className="flex gap-x-3 items-center">
+                        <span className="text-lg">Giá nhập: </span>
+                        <span className="text-primary text-lg font-semibold">{formatCurrencyVND(product?.purchasePrice)}</span>
+                    </div>
+
+                    <div className="flex gap-x-3 items-center">
+                        <span className="text-lg">Giá bán: </span>
                         <span className="line-through text-lg">{formatCurrencyVND(product?.oldPrice)}</span>
                         <span className="text-primary text-2xl font-semibold">{formatCurrencyVND(product?.price)}</span>
                     </div>
@@ -232,7 +244,7 @@ const ProductDetail: FC = () => {
                 </div>
             </div>
         </div>
-        <div className="col-span-4 flex flex-col gap-y-6 h-full overflow-y-hidden">
+        <div className="col-span-4 flex flex-col gap-y-6 h-full">
             <div className="bg-white shadow-sm rounded-lg p-6 flex flex-col gap-y-3">
                 <p className="font-semibold mb-4">Reviews & Rating</p>
                 {reportEvaluation?.report.totalEvaluation! > 0 ? <div className="flex flex-col gap-y-3">
@@ -294,7 +306,11 @@ const ProductDetail: FC = () => {
             <EditProductModal product={product!} handleOk={handleSubmit} />
         </Modal>
         {loading && <Loading />}
-    </div >;
+
+        <div className="col-span-12">
+            {product ? <VariantManagement product={product} /> : <Loading />}
+        </div>
+    </div >
 };
 
 export default ProductDetail;

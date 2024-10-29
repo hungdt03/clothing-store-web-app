@@ -1,13 +1,12 @@
-import { Button, Form, FormProps, GetProp, Image, Input, InputNumber, Select, Tooltip, Upload, UploadFile, UploadProps, message } from "antd";
+import { Button, Form, FormProps, GetProp, Input, InputNumber, Select, UploadFile, UploadProps, message } from "antd";
 import { FC, useEffect, useState } from "react";
-import { PlusOutlined, InboxOutlined } from '@ant-design/icons';
 import brandService from "../../../../services/brand-service";
-import Dragger from "antd/es/upload/Dragger";
 import { BrandResource, CategoryResource } from "../../../../resources";
 import categoryService from "../../../../services/category-service";
 import productService from "../../../../services/product-service";
 import Loading from "../../../shared/Loading";
-import { getBase64 } from "../../../../utils/file";
+import UploadSingleFile from "../uploads/UploadSingleFile";
+import UploadMultipleFile from "../uploads/UploadMultiFile";
 
 type FileType = Parameters<GetProp<UploadProps, 'beforeUpload'>>[0];
 
@@ -18,6 +17,7 @@ export type ProductRequest = {
     zoomImage: UploadFile[];
     oldPrice: number;
     price: number;
+    purchasePrice: number;
     brandId: number;
     categoryId: number;
     otherImages?: UploadFile[]
@@ -27,13 +27,6 @@ type CreateProductModalProps = {
     handleOk: () => void;
 }
 
-
-const uploadButton = (
-    <button style={{ border: 0, background: 'none' }} type="button">
-        <PlusOutlined />
-        <div style={{ marginTop: 8 }}>Upload</div>
-    </button>
-);
 
 const CreateProductModal: FC<CreateProductModalProps> = ({
     handleOk
@@ -82,6 +75,7 @@ const CreateProductModal: FC<CreateProductModalProps> = ({
         formData.append("brandId", String(values.brandId));
         formData.append("oldPrice", String(values.oldPrice));
         formData.append("price", String(values.price));
+        formData.append("purchasePrice", String(values.purchasePrice));
 
         setLoading(true)
         const response = await productService.createProduct(formData);
@@ -93,86 +87,12 @@ const CreateProductModal: FC<CreateProductModalProps> = ({
 
     const resetForm = () => {
         form.resetFields();
-        setFileOtherImagesList([])
-        setFileThumbnail([])
-        setFileZoomImage([])
     }
 
     const onFinishFailed: FormProps<ProductRequest>['onFinishFailed'] = (errorInfo) => {
         console.log('Failed:', errorInfo);
     };
 
-    const [fileOtherImagesList, setFileOtherImagesList] = useState<any[]>([]);
-    const [fileThumbnail, setFileThumbnail] = useState<UploadFile[]>([]);
-
-    const [fileZoomImage, setFileZoomImage] = useState<UploadFile[]>([]);
-
-    const [previewThumbnailOpen, setPreviewThumbnailOpen] = useState(false);
-    const [previewThumbnailImage, setPreviewThumbnailImage] = useState('');
-
-    const [previewZoomImageOpen, setPreviewZoomImageOpen] = useState(false);
-    const [previewZoomImageImage, setPreviewZoomImageImage] = useState('');
-
-    const [previewOtherImagesOpen, setPreviewOtherImagesOpen] = useState(false);
-    const [previewOtherImagesImage, setPreviewOtherImagesImage] = useState('');
-
-
-    const handleThumbnailPreview = async (file: UploadFile) => {
-        if (!file.url && !file.preview) {
-            file.preview = await getBase64(file.originFileObj as FileType);
-        }
-
-        setPreviewThumbnailImage(file.url ?? (file.preview as string));
-        setPreviewThumbnailOpen(true);
-    };
-
-    const handleZoomImagePreview = async (file: UploadFile) => {
-        if (!file.url && !file.preview) {
-            file.preview = await getBase64(file.originFileObj as FileType);
-        }
-
-        setPreviewZoomImageImage(file.url ?? (file.preview as string));
-        setPreviewZoomImageOpen(true);
-    };
-
-
-    const handleOtherImagesPreview = async (file: UploadFile) => {
-        if (!file.url && !file.preview) {
-            file.preview = await getBase64(file.originFileObj as FileType);
-        }
-
-        setPreviewOtherImagesImage(file.url ?? (file.preview as string));
-        setPreviewOtherImagesOpen(true);
-    };
-
-    const handleThumbnailChange: UploadProps['onChange'] = ({ fileList: newFileList }) => {
-        form.setFieldValue('thumbnail', newFileList)
-        setFileThumbnail(newFileList);
-    }
-
-    const handleZoomImageChange: UploadProps['onChange'] = ({ fileList: newFileList }) => {
-        form.setFieldValue('zoomImage', newFileList)
-        setFileZoomImage(newFileList);
-    }
-
-    const handleOtherImagesChange: UploadProps['onChange'] = ({ fileList: newFileList }) => {
-
-        form.setFieldValue('otherImages', newFileList);
-        setFileOtherImagesList(newFileList)
-    }
-
-
-    const props: UploadProps = {
-        name: 'file',
-        multiple: true,
-        onChange(info) {
-            form.setFieldValue('otherImages', info.fileList);
-            setFileOtherImagesList(info.fileList)
-        },
-        beforeUpload(_) {
-            return false;
-        }
-    };
 
     return <div className="px-4 pt-4 max-h-[500px] overflow-y-auto custom-scrollbar scrollbar-h-4">
         <Form
@@ -181,10 +101,6 @@ const CreateProductModal: FC<CreateProductModalProps> = ({
             onFinish={onFinish}
             layout="vertical"
             onFinishFailed={onFinishFailed}
-            initialValues={{
-                oldPrice: 100000,
-                price: 100000
-            }}
             autoComplete="off"
         >
             <div className="grid grid-cols-12 gap-x-8">
@@ -194,27 +110,10 @@ const CreateProductModal: FC<CreateProductModalProps> = ({
                         name="thumbnail"
                         rules={[{ required: true, message: 'Ảnh sản phẩm không được để trống!' }]}
                     >
-                        <Upload
-                            listType="picture-circle"
-                            fileList={fileThumbnail}
-                            onPreview={handleThumbnailPreview}
-                            onChange={handleThumbnailChange}
-                            maxCount={1}
-                            beforeUpload={() => false}
-                        >
-                            {fileThumbnail.length > 0 ? null : uploadButton}
-                        </Upload>
-                        {previewThumbnailImage && (
-                            <Image
-                                wrapperStyle={{ display: 'none' }}
-                                preview={{
-                                    visible: previewThumbnailOpen,
-                                    onVisibleChange: (visible) => setPreviewThumbnailOpen(visible),
-                                    afterOpenChange: (visible) => !visible && setPreviewThumbnailImage(''),
-                                }}
-                                src={previewThumbnailImage}
-                            />
-                        )}
+                        <UploadSingleFile
+                            onChange={(fileList) => form.setFieldValue('thumbnail', fileList)}
+                            valueUrl=""
+                        />
                     </Form.Item>
                     <Form.Item<ProductRequest>
                         label="Ảnh phóng to"
@@ -222,69 +121,19 @@ const CreateProductModal: FC<CreateProductModalProps> = ({
                         name="zoomImage"
                         rules={[{ required: true, message: 'Ảnh phóng to sản phẩm không được để trống!' }]}
                     >
-                        <Upload
-                            listType="picture-circle"
-                            fileList={fileZoomImage}
-                            onPreview={handleZoomImagePreview}
-                            onChange={handleZoomImageChange}
-                            beforeUpload={() => false}
-                        >
-                            {fileZoomImage.length >= 1 ? null : uploadButton}
-                        </Upload>
-                        {previewZoomImageImage && (
-                            <Image
-                                wrapperStyle={{ display: 'none' }}
-                                preview={{
-                                    visible: previewZoomImageOpen,
-                                    onVisibleChange: (visible) => setPreviewZoomImageOpen(visible),
-                                    afterOpenChange: (visible) => !visible && setPreviewZoomImageImage(''),
-                                }}
-                                src={previewZoomImageImage}
-                            />
-                        )}
+                        <UploadSingleFile
+                            onChange={(fileList) => form.setFieldValue('zoomImage', fileList)}
+                            valueUrl=""
+                        />
                     </Form.Item>
 
                     <Form.Item<ProductRequest>
                         label="Các ảnh khác"
                         name="otherImages"
                     >
-                        <>
-                            {fileOtherImagesList.length === 0 ? (
-
-                                <Dragger {...props} style={{ marginBottom: '20px' }}>
-                                    <p className="ant-upload-drag-icon">
-                                        <InboxOutlined />
-                                    </p>
-                                    <p className="ant-upload-text">Thêm ảnh</p>
-                                    <p className="ant-upload-hint">
-                                        Ấn hoặc kéo thả ảnh vào khu vực này
-                                    </p>
-                                </Dragger>
-                            ) : (
-                                <div className="mb-4">
-                                    <Upload
-                                        beforeUpload={() => false}
-                                        listType="picture-card"
-                                        fileList={fileOtherImagesList}
-                                        onPreview={handleOtherImagesPreview}
-                                        onChange={handleOtherImagesChange}
-                                    >
-                                        {fileOtherImagesList.length >= 8 ? null : uploadButton}
-                                    </Upload>
-                                    {previewOtherImagesImage && (
-                                        <Image
-                                            wrapperStyle={{ display: 'none' }}
-                                            preview={{
-                                                visible: previewOtherImagesOpen,
-                                                onVisibleChange: (visible) => setPreviewOtherImagesOpen(visible),
-                                                afterOpenChange: (visible) => !visible && setPreviewOtherImagesImage(''),
-                                            }}
-                                            src={previewOtherImagesImage}
-                                        />
-                                    )}
-                                </div>
-                            )}
-                        </>
+                        <UploadMultipleFile
+                            onChange={(fileList) => form.setFieldValue('otherImages', fileList)}
+                        />
                     </Form.Item>
                 </div>
                 <div className="col-span-7">
@@ -352,14 +201,20 @@ const CreateProductModal: FC<CreateProductModalProps> = ({
                         <Input.TextArea size="large" placeholder="Mô tả ..." />
                     </Form.Item>
 
-
+                    <Form.Item<ProductRequest>
+                        label="Giá nhập"
+                        name="purchasePrice"
+                        rules={[{ required: true, message: 'Giá nhập không được để trống!' }]}
+                    >
+                        <InputNumber size="large" style={{ width: '100%' }} />
+                    </Form.Item>
 
                     <Form.Item<ProductRequest>
                         label="Giá cũ"
                         name="oldPrice"
                         rules={[{ required: true, message: 'Giá cũ không được để trống!' }]}
                     >
-                        <InputNumber size="large" style={{ width: '100%' }} defaultValue={100000} />
+                        <InputNumber size="large" style={{ width: '100%' }} />
                     </Form.Item>
 
                     <Form.Item<ProductRequest>
@@ -367,7 +222,7 @@ const CreateProductModal: FC<CreateProductModalProps> = ({
                         name="price"
                         rules={[{ required: true, message: 'Giá hiện tại sản phẩm không được để trống!' }]}
                     >
-                        <InputNumber size="large" style={{ width: '100%' }} defaultValue={100000} />
+                        <InputNumber size="large" style={{ width: '100%' }} />
                     </Form.Item>
                 </div>
             </div>

@@ -34,9 +34,9 @@ namespace back_end.Controllers
         }
 
         [HttpGet("product/{productId}")]
-        public async Task<IActionResult> GetAllVariantsByProductId([FromRoute] int productId)
+        public async Task<IActionResult> GetAllVariantsByProductId([FromRoute] int productId, [FromQuery] int pageIndex = 1, [FromQuery] int pageSize = 8, [FromQuery] string searchString = "")
         {
-            var response = await variantService.GetAllVariantsByProductId(productId);
+            var response = await variantService.GetAllVariantsByProductId(productId, pageIndex, pageSize, searchString);
             return Ok(response);
         }
 

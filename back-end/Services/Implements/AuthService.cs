@@ -14,16 +14,18 @@ namespace back_end.Services.Implements
     public class AuthService : IAuthService
     {
         private readonly SignInManager<User> signInManager;
+        private readonly RoleManager<IdentityRole> roleManager;
         private readonly UserManager<User> userManager;
         private readonly ApplicationMapper applicationMapper;
         private readonly JwtService jwtService;
 
-        public AuthService(SignInManager<User> signInManager, UserManager<User> userManager, ApplicationMapper mapper, JwtService jwtService)
+        public AuthService(SignInManager<User> signInManager, UserManager<User> userManager, ApplicationMapper mapper, JwtService jwtService, RoleManager<IdentityRole> roleManager)
         {
             this.signInManager = signInManager;
             this.userManager = userManager;
             applicationMapper = mapper;
             this.jwtService = jwtService;
+            this.roleManager = roleManager;
         }
 
         public async Task<BaseResponse> GoogleAuthorize(string accessToken)
@@ -79,8 +81,13 @@ namespace back_end.Services.Implements
             var hasGoogleLogin = logins.Any(login => login.LoginProvider == "Google");
             if (!hasGoogleLogin)
             {
-                var resultPushRole = await userManager.AddToRoleAsync(user, "CUSTOMER");
-                if (!resultPushRole.Succeeded) throw new Exception("Có lỗi khi cấp quyền cho user");
+                var isInRoles = await userManager.IsInRoleAsync(user, "CUSTOMER");
+
+                if (!isInRoles) {
+
+                    var resultPushRole = await userManager.AddToRoleAsync(user, "CUSTOMER");
+                    if (!resultPushRole.Succeeded) throw new Exception("Có lỗi khi cấp quyền cho user");
+                }
 
                 var addLoginResult = await userManager.AddLoginAsync(user, new UserLoginInfo("Google", userInfo.Id, "Google"));
 

@@ -12,6 +12,7 @@ export type EditProductRequest = {
     brandId?: number;
     oldPrice?: number;
     price?: number;
+    purchasePrice?: number;
 };
 
 type EditProductModalProps = {
@@ -46,6 +47,7 @@ const EditProductModal: FC<EditProductModalProps> = ({
                 name: product.name,
                 description: product.description,
                 oldPrice: product.oldPrice,
+                purchasePrice: product.purchasePrice,
                 price: product.price,
             });
         }
@@ -141,14 +143,20 @@ const EditProductModal: FC<EditProductModalProps> = ({
                     <Input.TextArea size="large" placeholder="Mô tả ..." />
                 </Form.Item>
 
-
+                <Form.Item<EditProductRequest>
+                    label="Giá nhập"
+                    name="purchasePrice"
+                    rules={[{ required: true, message: 'Giá nhập không được để trống!' }]}
+                >
+                    <InputNumber size="large" style={{ width: '100%' }} />
+                </Form.Item>
 
                 <Form.Item<EditProductRequest>
                     label="Giá cũ"
                     name="oldPrice"
                     rules={[{ required: true, message: 'Giá cũ không được để trống!' }]}
                 >
-                    <InputNumber size="large" style={{ width: '100%' }} defaultValue={100000} />
+                    <InputNumber size="large" style={{ width: '100%' }} />
                 </Form.Item>
 
                 <Form.Item<EditProductRequest>
@@ -156,7 +164,7 @@ const EditProductModal: FC<EditProductModalProps> = ({
                     name="price"
                     rules={[{ required: true, message: 'Giá hiện tại sản phẩm không được để trống!' }]}
                 >
-                    <InputNumber size="large" style={{ width: '100%' }} defaultValue={100000} />
+                    <InputNumber size="large" style={{ width: '100%' }} />
                 </Form.Item>
             </div>
 

@@ -16,8 +16,8 @@ const NotificationDialog: FC<NotificationDialogProps> = ({
         <div>
             <span className="text-xl font-semibold">Thông báo của bạn</span>
         </div>
-        {notifications.length === 0 && <Empty description='Chưa có thông báo nào' />}
-        {notifications.map(notification => <Notification key={notification.id} notification={notification} />)}
+        {notifications?.length === 0 && <Empty description='Chưa có thông báo nào' />}
+        {notifications?.map(notification => <Notification key={notification.id} notification={notification} />)}
      
     </div>
 };

@@ -100,6 +100,7 @@ export type ProductResource = {
     description: string;
     oldPrice: number;
     price: number;
+    purchasePrice: number;
     quantity: number;
     thumbnail: string;
     zoomImage: string;

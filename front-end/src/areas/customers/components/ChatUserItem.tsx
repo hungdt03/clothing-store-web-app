@@ -24,8 +24,8 @@ const ChatUserItem: FC<ChatUserItemProps> = ({
         <div className="flex flex-col flex-1">
             <b>{group.user.name}</b>
             <div className="flex items-center justify-between text-[14px] gap-x-2">
-                <p className="w-32 truncate">{group.latestMessage}</p>
-                <span className="text-sky-600">{group.latestTime ? formatTimeTypeAgo(new Date(group.latestTime)) : 'Chưa kết nối'}</span>
+                <p className="w-32 truncate">{group.message.content}</p>
+                <span className="text-sky-600">{group.message.sentAt ? formatTimeTypeAgo(new Date(group.message.sentAt)) : 'Chưa kết nối'}</span>
             </div>
 
         </div>

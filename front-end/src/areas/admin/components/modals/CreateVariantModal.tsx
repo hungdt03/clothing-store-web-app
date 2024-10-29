@@ -76,6 +76,7 @@ const CreateVariantModal: FC<CreateVariantModalProps> = ({
 
         setLoading(true)
         const response = await variantService.createVariant(formData);
+        console.log(response)
         message.success(response.message)
         resetForm();
         handleOk()

@@ -63,7 +63,7 @@ namespace back_end.Services.Implements
 
         public async Task<BaseResponse> GetAllContactAccounts()
         {
-            var userName = _contextAccessor.HttpContext.User.FindFirstValue(ClaimTypes.Name);
+            var userName = _contextAccessor.HttpContext.User.GetUsername();
             List<User> users = await _dbContext.Users
                 .Where(u => u.UserName != userName)
                 .ToListAsync();
@@ -105,7 +105,7 @@ namespace back_end.Services.Implements
 
         public async Task<BaseResponse> GetAllAdminAccounts()
         {
-            var userName = _contextAccessor.HttpContext.User.FindFirstValue(ClaimTypes.Name);
+            var userName = _contextAccessor.HttpContext.User.GetUsername();
             List<User> users = await _dbContext.Users
                 .Where(u => u.UserName != userName)
                 .ToListAsync();

@@ -15,8 +15,9 @@ class VariantService {
         return axiosConfig.get("/api/Variant/" + id);
     }
 
-    getAllVariantsByProductId(productId: number | string): Promise<DataResponse<VariantResource[]>> {
-        return axiosConfig.get("/api/Variant/product/" + productId);
+    getAllVariantsByProductId(productId: number | string, params?: QueryParams): Promise<PaginationResponse<VariantResource[]>> {
+        const queryString = new URLSearchParams(params as any).toString();
+        return axiosConfig.get("/api/Variant/product/" + productId + '/?' + queryString);
     }
 
     getAllVariantsByProductIdAndColorId(productId: number | string, colorId: number | string): Promise<DataResponse<VariantResource[]>> {

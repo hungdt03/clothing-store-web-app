@@ -35,6 +35,12 @@ namespace back_end.Services.Implements
             Color? color = await dbContext.Colors.SingleOrDefaultAsync(c => c.Id == request.ColorId)
                 ?? throw new NotFoundException("Không tìm thấy màu sắc");
 
+            ProductVariant? checkVariant = await dbContext.ProductVariants
+                .SingleOrDefaultAsync(p => p.SizeId == request.SizeId && p.ColorId == request.ColorId && p.ProductId == request.ProductId);
+
+            if (checkVariant != null)
+                throw new Exception("Biến thể này đã tồn tại");
+
             ProductVariant variant = new ProductVariant();
             variant.ProductId = request.ProductId;
             variant.SizeId = request.SizeId;
@@ -114,20 +120,58 @@ namespace back_end.Services.Implements
             return response;
         }
 
-        public async Task<BaseResponse> GetAllVariantsByProductId(int productId)
+        public async Task<BaseResponse> GetAllVariantsByProductId(int productId, int pageIndex, int pageSize, string searchString)
         {
-            List<ProductVariant> variants = await dbContext.ProductVariants
+            string lowerString = searchString?.ToLower() ?? string.Empty;
+
+            var queryable = dbContext.ProductVariants
+                .AsNoTracking()
+                .Include(p => p.Product)
+                .Where(v => v.ProductId == productId && !v.IsDeleted && (string.IsNullOrEmpty(lowerString) || v.Product.Name.ToLower().Contains(lowerString)));
+
+            int totalItems = await queryable.CountAsync();
+
+            if (lowerString != null && lowerString.Length > 1)
+            {
+                pageIndex = 1;
+            }
+
+            List<ProductVariant> variants = await queryable
                 .Include(p => p.Color)
                 .Include(p => p.Size)
-                .Where(p => p.ProductId == productId && !p.IsDeleted).ToListAsync();
+                .Include(p => p.Images)
+                .Skip((pageIndex - 1) * pageSize)
+                .Take(pageSize)
+                .ToListAsync();
 
-            var response = new DataResponse<List<VariantResource>>();
-            response.StatusCode = System.Net.HttpStatusCode.OK;
-            response.Success = true;
-            response.Message = "Lấy danh sách sản phẩm thành công";
-            response.Data = variants.Select(variant => applicationMapper.MapToVariantResource(variant)).ToList();
+            var response = new PaginationResponse<List<VariantResource>>
+            {
+                StatusCode = System.Net.HttpStatusCode.OK,
+                Success = true,
+                Message = "Lấy danh sách sản phẩm thành công",
+                Data = variants.Select(variant => applicationMapper.MapToVariantResource(variant)).ToList(),
+                Pagination = new Pagination()
+                {
+                    TotalItems = totalItems,
+                    TotalPages = (int)Math.Ceiling((double)totalItems / pageSize),
+                    PageIndex = pageIndex,
+                    PageSize = pageSize,
+                }
+            };
 
             return response;
+            //List<ProductVariant> variants = await dbContext.ProductVariants
+            //    .Include(p => p.Color)
+            //    .Include(p => p.Size)
+            //    .Where(p => p.ProductId == productId && !p.IsDeleted).ToListAsync();
+
+            //var response = new DataResponse<List<VariantResource>>();
+            //response.StatusCode = System.Net.HttpStatusCode.OK;
+            //response.Success = true;
+            //response.Message = "Lấy danh sách sản phẩm thành công";
+            //response.Data = variants.Select(variant => applicationMapper.MapToVariantResource(variant)).ToList();
+
+            //return response;
         }
 
         public async Task<BaseResponse> GetAllVariantsByProductIdAndColorId(int productId, int colorId)

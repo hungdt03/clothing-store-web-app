@@ -1,4 +1,4 @@
-import { Badge, Image, Modal, Tooltip, message } from "antd";
+import { Badge, Image, Modal, Tooltip } from "antd";
 import { FC, useEffect, useState } from "react";
 import {
     ShoppingCartOutlined
@@ -7,9 +7,6 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEye, faHeart } from "@fortawesome/free-regular-svg-icons";
 import { ProductResource, VariantResource } from "../../../resources";
 import variantService from "../../../services/variant-service";
-import { CartItemPayload, addNewOrIncreaseQuantity } from "../../../feature/cart/cartSlice";
-import { useDispatch } from "react-redux";
-import { AppDispatch } from "../../../app/store";
 import { Link } from "react-router-dom";
 import { formatCurrencyVND } from "../../../utils/format";
 import useModal from "../../../hooks/useModal";
@@ -42,8 +39,6 @@ const ProductInner: FC<ProductProps> = ({
     const [showImage, setShowImage] = useState(product.thumbnail);
     const { handleCancel, handleOk, isModalOpen, showModal } = useModal()
 
-    const dispatch = useDispatch<AppDispatch>();
-
     useEffect(() => {
         const fetchVariants = async () => {
             const response = await variantService.getUniqueColorVariantsByProductId(product.id);
@@ -62,19 +57,6 @@ const ProductInner: FC<ProductProps> = ({
     const handleSelectVariant = (variant: VariantResource) => {
         setSelectVariant(variant)
         setShowImage(variant.thumbnailUrl)
-    }
-
-    const handleAddItemToCart = () => {
-        const payload: CartItemPayload = {
-            price: product.price,
-            quantity: 1,
-            variant: selectVariant!,
-            product: product
-        }
-
-        dispatch(addNewOrIncreaseQuantity(payload));
-        message.success('Thêm sản phẩm vào giỏ hàng thành công')
-
     }
 
     useEffect(() => {

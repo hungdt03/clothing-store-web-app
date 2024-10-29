@@ -148,10 +148,6 @@ const router = createBrowserRouter([
                         element: <AccountManagement />,
                     },
                     {
-                        path: 'variant',
-                        element: <VariantManagement />,
-                    },
-                    {
                         path: 'variant/:id',
                         element: <VariantDetails />,
                     },

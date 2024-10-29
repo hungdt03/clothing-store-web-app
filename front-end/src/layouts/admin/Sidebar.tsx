@@ -19,7 +19,6 @@ const items: MenuItem[] = [
             { key: '4', label: <Link to='/admin/category'>Danh mục</Link> },
             { key: '5', label: <Link to='/admin/brand'>Nhãn hiệu</Link> },
             { key: '6', label: <Link to='/admin/product'>Sản phẩm</Link> },
-            { key: '7', label: <Link to='/admin/variant'>Biến thể SP</Link> },
             { key: '8', label: <Link to='/admin/order'>Đơn hàng</Link> },
             { key: '9', label: <Link to='/admin/account'>Tài khoản</Link> },
         ],

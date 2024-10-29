@@ -70,6 +70,7 @@ namespace back_end.Services.Implements
                 product.Description = request.Description;
                 product.OldPrice = request.OldPrice;
                 product.Price = request.Price;
+                product.PurchasePrice = request.PurchasePrice;
                 product.BrandId = request.BrandId;
                 product.CategoryId = request.CategoryId;
                 product.Images = new List<ProductImage>();
@@ -212,6 +213,7 @@ namespace back_end.Services.Implements
             product.Description = request.Description;
             product.OldPrice = request.OldPrice;
             product.Price = request.Price;
+            product.PurchasePrice = request.PurchasePrice;
             product.BrandId = request.BrandId;
             product.CategoryId = request.CategoryId;
 

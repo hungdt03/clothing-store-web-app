@@ -5,3 +5,5 @@ firebase-service-account.json
 bin/
 obj/
 .vs/
+
+firebase-service-account.json

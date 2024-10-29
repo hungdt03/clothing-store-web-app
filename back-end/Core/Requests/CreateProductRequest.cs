@@ -12,6 +12,8 @@ namespace back_end.Core.Requests
         public double OldPrice { get; set; }
         [Required(ErrorMessage = "Giá sản phẩm không được để trống")]
         public double Price { get; set; }
+        [Required(ErrorMessage = "Giá nhập không được để trống")]
+        public double PurchasePrice { get; set; }
         [Required(ErrorMessage = "Ảnh sản phẩm không được để trống")]
         public List<IFormFile> Thumbnail { get; set; }
         [Required(ErrorMessage = "Ảnh phóng to của sản phẩm không được để trống")]

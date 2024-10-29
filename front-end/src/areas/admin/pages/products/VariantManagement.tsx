@@ -1,14 +1,15 @@
 import { FC, useEffect, useState } from "react";
-import { Button, Image, Modal, Pagination, Popconfirm, Space, Table, message } from 'antd';
+import { Button, Image, Modal, Popconfirm, Space, Table, message } from 'antd';
 import type { TableProps } from 'antd';
 import { DeleteOutlined, EyeOutlined } from '@ant-design/icons';
 import useModal from "../../../../hooks/useModal";
 import variantService from "../../../../services/variant-service";
 import CreateVariantModal from "../../components/modals/CreateVariantModal";
-import { VariantResource } from "../../../../resources";
+import { ProductResource, VariantResource } from "../../../../resources";
 import { Link } from "react-router-dom";
 import TitleHeader from "../../components/TitleHeader";
 import useDebounce from "../../../../hooks/useDebounce";
+import images from "../../../../assets";
 
 
 export type QueryParams = {
@@ -23,7 +24,13 @@ const initialValues: QueryParams = {
     searchString: ''
 }
 
-const VariantManagement: FC = () => {
+type VariantManagementProps = {
+    product: ProductResource
+}
+
+const VariantManagement: FC<VariantManagementProps> = ({
+    product
+}) => {
     const [variants, setVariants] = useState<VariantResource[]>([]);
     const { isModalOpen, handleCancel, handleOk, showModal } = useModal()
     const [queryParams, setQueryParams] = useState<QueryParams>(initialValues);
@@ -31,7 +38,7 @@ const VariantManagement: FC = () => {
     const debounceValue = useDebounce(queryParams.searchString, 600);
 
     const fetchVariants = async (params: QueryParams) => {
-        const response = await variantService.getAllVariants(params);
+        const response = await variantService.getAllVariantsByProductId(product.id, params);
         setVariants(response.data);
         setTotal(response.pagination.totalItems)
     }
@@ -62,15 +69,9 @@ const VariantManagement: FC = () => {
             dataIndex: 'thumbnailUrl',
             key: 'thumbnailUrl',
             render(value) {
-                return <Image src={value} preview={false} width='80px' height='80px' className="rounded-xl object-cover" />
-            },
-        },
-        {
-            title: 'Tên sản phẩm',
-            dataIndex: 'name',
-            key: 'name',
-            render(_, record) {
-                return <span>{record.product.name}</span>
+                return <Image onError={(e) => {
+                    e.currentTarget.src = images.menCloth;
+                }} src={value} preview={false} width='80px' height='80px' className="rounded-xl object-cover" />
             },
         },
         {
@@ -106,7 +107,7 @@ const VariantManagement: FC = () => {
                 <Space size="middle">
                     <Popconfirm
                         title="Xóa sản phẩm"
-                        description="Bạn có chắc là muốn xóa sản phẩm?"
+                        description="Bạn có chắc là muốn xóa biến thể này?"
                         onConfirm={() => confirmRemove(record.id)}
                         okText="Chắc chắn"
                         cancelText="Hủy bỏ"

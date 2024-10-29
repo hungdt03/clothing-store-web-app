@@ -15,6 +15,7 @@ import Loading from "../../../shared/Loading";
 import CheckBoxImage from "../../components/CheckBoxImage";
 import variantService from "../../../../services/variant-service";
 import EditVariantModal from "../../components/modals/EditVariantModal";
+import images from "../../../../assets";
 
 
 type FileType = Parameters<GetProp<UploadProps, 'beforeUpload'>>[0];
@@ -41,7 +42,7 @@ const VariantDetail: FC = () => {
     const [previewImage, setPreviewImage] = useState('');
     const [fileList, setFileList] = useState<UploadFile[]>([]);
     const [fileRemoves, setFileRemoves] = useState([])
-   
+
     const fetchVariant = async () => {
         const response = await variantService.getVariantById(id!);
         console.log(response)
@@ -124,12 +125,14 @@ const VariantDetail: FC = () => {
     }
 
 
-    return <div className="grid grid-cols-12 gap-6">
-        <div className="col-span-8 flex flex-col gap-y-6 relative">
+    return <>
+        <div className="flex flex-col gap-y-6 relative">
             <div className="bg-white shadow-sm rounded-lg p-6 grid grid-cols-12 gap-x-6">
                 <div className="col-span-6 flex flex-col gap-y-4">
                     <div className="relative">
-                        <Image preview={false} className="rounded-3xl object-cover" width='100%' src={variant?.thumbnailUrl} />
+                        <Image preview={false} onError={(e) => {
+                            e.currentTarget.src = images.demoMenth; 
+                        }} className="rounded-3xl object-cover" width='100%' src={variant?.thumbnailUrl ?? images.demoMenth} />
                         <Tooltip title="Cập nhật ảnh">
                             <span className="absolute -bottom-2 shadow-xl cursor-pointer flex items-center justify-center -right-2 w-10 h-10 rounded-full bg-white">
                                 <ImgCrop modalTitle="Cập nhật ảnh" modalCancel="Hủy bỏ" modalOk="Lưu lại" rotationSlider>
@@ -152,6 +155,7 @@ const VariantDetail: FC = () => {
                     <div className="flex flex-col">
                         <span className="text-lg">Màu sắc: <b>{variant?.color.name}</b></span>
                         <span className="text-lg">Kích cỡ: <b>{variant?.size.eSize}</b></span>
+                        <span className="text-lg">Tồn kho: <b>{variant?.inStock}</b></span>
                     </div>
                 </div>
                 <Button onClick={showModal} shape="circle" className="absolute top-4 right-4" icon={<EditOutlined />} ></Button>
@@ -195,22 +199,11 @@ const VariantDetail: FC = () => {
                 </div>
             </div>
         </div>
-        <div className="col-span-4 flex flex-col gap-y-6">
-            <div className="bg-white shadow-sm rounded-lg p-6">
-                <p className="font-semibold mb-4">Reviews & Rating</p>
-                <div className="flex gap-x-4 items-start">
-                   
-                </div>
-            </div>
-            <div className="bg-white shadow-sm rounded-lg p-6">
-                
-            </div>
-        </div>
 
         <Modal
             open={isModalOpen}
             onOk={handleOk}
-            title={<p className="text-center font-semibold text-2xl">Cập nhật sản phẩm</p>}
+            title={<p className="text-center font-semibold text-2xl">Cập nhật thông tin</p>}
             onCancel={handleCancel}
             width='800px'
             footer={[]}
@@ -218,7 +211,8 @@ const VariantDetail: FC = () => {
             <EditVariantModal variant={variant!} handleOk={handleSubmit} />
         </Modal>
         {loading && <Loading />}
-    </div>;
+    </>
+
 };
 
 export default VariantDetail;

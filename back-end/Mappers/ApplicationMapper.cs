@@ -58,6 +58,7 @@ namespace back_end.Mappers
                 OldPrice = product.OldPrice,
                 Quantity = product?.ProductVariants != null ? product.ProductVariants.Count : 0,
                 Price = product.Price,
+                PurchasePrice = product.PurchasePrice,
                 ZoomImage = product.ZoomImage,
                 Thumbnail = product.Thumbnail,
                 Images = product.Images != null ? product.Images.Select(MapToProductImageResource).ToList() : null,

@@ -31,7 +31,7 @@ const GroupSizeRadio: FC<GroupSizeRadioProps> = ({
             className="w-10 h-10 p-[2px] flex items-center border-[1px] rounded-md justify-center cursor-pointer"
             onClick={() => handleSelectSize(size)}
             style={{
-                backgroundColor: size?.id === selected ? '#fb923c444' : 'white',
+                backgroundColor: size?.id === selected ? '#fb923c' : 'white',
                 color: size?.id === selected ? 'white' : 'black',
             }}>
                 {size?.eSize}
