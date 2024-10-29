@@ -20,19 +20,75 @@ namespace back_end.Services.Implements
             applicationMapper = mapper;
         }
 
-        public async Task<BaseResponse> GetReportData()
+        public async Task<BaseResponse> GetReportData(string type, DateTime? from, DateTime? to)
         {
-            int products = await dbContext.Products.CountAsync();
-            int categories = await dbContext.Categories.CountAsync();
-            int orders = await dbContext.Orders.CountAsync();
-            int users = await dbContext.Users.CountAsync();
+            DateTime startDate;
+            DateTime endDate = DateTime.Now;
+
+            type ??= "";
+
+            switch (type.ToLower())
+            {
+                case "today":
+                    startDate = DateTime.Now.Date;
+                    break;
+                case "yesterday":
+                    startDate = DateTime.Now.Date.AddDays(-1);
+                    endDate = startDate.AddDays(1).AddTicks(-1); 
+                    break;
+                case "week":
+                    startDate = DateTime.Now.Date.AddDays(-7);
+                    break;
+                case "month":
+                    startDate = DateTime.Now.Date.AddMonths(-1);
+                    break;
+                default:
+                    if (from.HasValue && to.HasValue)
+                    {
+                        startDate = from.Value.Date;
+                        endDate = to.Value.Date.AddDays(1).AddTicks(-1);
+                    }
+                    else
+                    {
+                        startDate = DateTime.MinValue; 
+                    }
+                    break;
+            }
+
+            var orders = await dbContext.Orders
+                .Where(p => p.CreatedAt >= startDate && p.CreatedAt <= endDate)
+                .ToListAsync();
+
+            var orderItems = await dbContext.OrderItems
+                .Include(o => o.Order)
+                .Include(o => o.ProductVariant)
+                    .ThenInclude(o => o.Product)
+                .Where(p => p.Order.CreatedAt >= startDate && p.Order.CreatedAt <= endDate)
+                .ToListAsync();
+
+            int countProducts = orderItems
+                .Where(p => p.Order.OrderStatus != OrderStatus.REJECTED && p.Order.OrderStatus != OrderStatus.CANCELLED)
+                .Sum(s => s.Quantity);
+
+            var countOrders = orders.Where(p => p.OrderStatus != OrderStatus.REJECTED && p.OrderStatus != OrderStatus.CANCELLED).Count();
+
+            var revenue = orders
+                .Where(p => p.OrderStatus == OrderStatus.COMPLETED || p.OrderStatus == OrderStatus.DELIVERED)
+                .Sum(o => o.TotalPrice);
+
+            var cost = orderItems
+                .Where(p => p.Order.OrderStatus == OrderStatus.COMPLETED || p.Order.OrderStatus == OrderStatus.DELIVERED)
+                .Sum(s => s.ProductVariant.Product.PurchasePrice * s.Quantity);
+
+            var profit = revenue - cost;
 
             var report = new ReportResource()
             {
-                Products = products,
-                Categories = categories,
-                Orders = orders,
-                Accounts = users,
+                Products = countProducts,
+                Orders = countOrders,
+                TotalRevenue = revenue,
+                Profit = profit,
+                TotalCost = cost
             };
 
             var orderQueryable = dbContext.Orders
@@ -41,7 +97,7 @@ namespace back_end.Services.Implements
                 .ThenInclude(o => o.Product);
 
             var newestOrders = orderQueryable
-                .Take(Math.Min(5, orders))
+                .Take(Math.Min(5, orders.Count))
                 .OrderByDescending(o => o.CreatedAt)
                 .ToList();
 

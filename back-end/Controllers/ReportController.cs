@@ -20,9 +20,10 @@ namespace back_end.Controllers
 
         [HttpGet]
         [ProducesResponseType(200)]
-        public async Task<BaseResponse> GetReportData()
+        public async Task<BaseResponse> GetReportData([FromQuery] string type, [FromQuery] DateTime? from, [FromQuery] DateTime? to)
         {
-            var response = await reportService.GetReportData();
+            
+            var response = await reportService.GetReportData(type, from, to);
             return response;
         }
 

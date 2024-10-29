@@ -206,7 +206,7 @@ const CreateProductModal: FC<CreateProductModalProps> = ({
                         name="purchasePrice"
                         rules={[{ required: true, message: 'Giá nhập không được để trống!' }]}
                     >
-                        <InputNumber size="large" style={{ width: '100%' }} />
+                        <InputNumber placeholder="Giá nhập" size="large" style={{ width: '100%' }} />
                     </Form.Item>
 
                     <Form.Item<ProductRequest>
@@ -214,7 +214,7 @@ const CreateProductModal: FC<CreateProductModalProps> = ({
                         name="oldPrice"
                         rules={[{ required: true, message: 'Giá cũ không được để trống!' }]}
                     >
-                        <InputNumber size="large" style={{ width: '100%' }} />
+                        <InputNumber placeholder="Giá cũ" size="large" style={{ width: '100%' }} />
                     </Form.Item>
 
                     <Form.Item<ProductRequest>
@@ -222,7 +222,7 @@ const CreateProductModal: FC<CreateProductModalProps> = ({
                         name="price"
                         rules={[{ required: true, message: 'Giá hiện tại sản phẩm không được để trống!' }]}
                     >
-                        <InputNumber size="large" style={{ width: '100%' }} />
+                        <InputNumber placeholder="Giá hiện tại" size="large" style={{ width: '100%' }} />
                     </Form.Item>
                 </div>
             </div>

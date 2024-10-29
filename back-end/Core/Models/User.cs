@@ -19,6 +19,7 @@ namespace back_end.Core.Models
         public List<Blog> Blogs { get; set; }
         public List<Notification> Notifications { get; set; }
         public Wishlist Wishlist { get; set; }
+        public DateTime? CreatedDate { get; set; } = DateTime.Now;
         public bool IsLocked { get; set; } = false;
     }
 }

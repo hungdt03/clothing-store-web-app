@@ -18,7 +18,7 @@ class AccountService {
     }
 
     getAllAccounts(queryParams?: QueryParams): Promise<PaginationResponse<UserResource[]>> {
-        var queryString = new URLSearchParams(queryParams as any).toString()
+        const queryString = new URLSearchParams(queryParams as any).toString()
         return axiosConfig.get('/api/Account?' + queryString);
     }
 

@@ -18,7 +18,6 @@ import ProfilePage from "../areas/customers/pages/ProfilePage";
 import BrandManagement from "../areas/admin/pages/BrandManagement";
 import ColorManagement from "../areas/admin/pages/ColorManagement";
 import SizeManagement from "../areas/admin/pages/SizeManagement";
-import VariantManagement from "../areas/admin/pages/products/VariantManagement";
 import CheckoutPage from "../areas/customers/pages/CheckoutPage";
 import AddressOrderPage from "../areas/customers/pages/AddressOrderPage";
 import ErrorBoundary from "../areas/shared/ErrorBoundary";
@@ -26,7 +25,6 @@ import NotFound from "../areas/shared/page/NotFound";
 import ResultLayout from "../layouts/result/ResultLayout";
 import OrderSuccessPage from "../areas/customers/pages/OrderSuccessPage";
 import ForbbidenPage from "../areas/customers/pages/ForbbidenPage";
-import AdminRoute from "./AdminRoute";
 import VariantDetails from "../areas/admin/pages/products/VariantDetails";
 import ChatPage from "../areas/admin/pages/ChatPage";
 import MainLayout from "../layouts/MainLayout";
@@ -41,10 +39,13 @@ import BlogLayout from "../layouts/blog/BlogLayout";
 import EditBlogPage from "../areas/admin/pages/blogs/EditBlogPage";
 import SlideShowManagement from "../areas/admin/pages/settings/SlideShowManagement";
 import ReviewShowManagement from "../areas/admin/pages/settings/ReviewShowManagement";
+import AuthGuard from "./auth-guard";
+import RoleBasedGuard from "./role-based-guard";
 
 const router = createBrowserRouter([
     {
         path: '/',
+        errorElement: <ErrorBoundary />,
         element: <MainLayout />,
         children: [
             {
@@ -96,16 +97,13 @@ const router = createBrowserRouter([
                     },
                 ]
             },
-
             {
-                errorElement: <ErrorBoundary />,
                 path: "/checkout",
-                element: <CheckoutPage />,
+                element: <AuthGuard element={<CheckoutPage />} />,
             },
             {
-                errorElement: <ErrorBoundary />,
                 path: "/account",
-                element: <AccountLayout />,
+                element: <AuthGuard element={<AccountLayout />} />,
                 children: [
                     {
                         path: "orders",
@@ -123,90 +121,87 @@ const router = createBrowserRouter([
             },
             {
                 path: 'reset-password',
-                element: <ResetPassword />
+                element: <AuthGuard element={<ResetPassword />} />
             }
         ]
     },
     {
         path: "/admin",
-        element: <AdminRoute />,
+        errorElement: <ErrorBoundary />,
+        element: <AuthGuard element={
+            <RoleBasedGuard accessibleRoles={['ADMIN']} element={<AdminLayout />} />
+        } />,
         children: [
             {
-                path: '',
-                element: <AdminLayout />,
-                children: [
-                    {
-                        path: 'dashboard',
-                        element: <Dashboard />,
-                    },
-                    {
-                        path: 'product',
-                        element: <ProductManagement />,
-                    },
-                    {
-                        path: 'account',
-                        element: <AccountManagement />,
-                    },
-                    {
-                        path: 'variant/:id',
-                        element: <VariantDetails />,
-                    },
-                    {
-                        path: 'product/:id',
-                        element: <ProductDetail />,
-                    },
-                    {
-                        path: 'category',
-                        element: <CategoryManagement />
-                    },
-                    {
-                        path: 'brand',
-                        element: <BrandManagement />
-                    },
-                    {
-                        path: 'color',
-                        element: <ColorManagement />
-                    },
-                    {
-                        path: 'size',
-                        element: <SizeManagement />
-                    },
-                    {
-                        path: 'order',
-                        element: <OrderManagement />
-                    },
-                    {
-                        path: 'order/:id',
-                        element: <OrderDetails />
-                    },
-                    {
-                        path: 'conservation',
-                        element: <ChatPage />
-                    },
-                    {
-                        path: 'blog',
-                        element: <BlogManagement />
-                    },
-                    {
-                        path: 'blog/create',
-                        element: <CreateBlogPage />
-                    },
-                    {
-                        path: 'blog/edit/:id',
-                        element: <EditBlogPage />
-                    },
-                    {
-                        path: 'setting/slide',
-                        element: <SlideShowManagement />
-                    },
-                    {
-                        path: 'setting/top-review',
-                        element: <ReviewShowManagement />
-                    },
+                path: 'dashboard',
+                element: <Dashboard />,
+            },
+            {
+                path: 'product',
+                element: <ProductManagement />,
+            },
+            {
+                path: 'account',
+                element: <AccountManagement />,
+            },
+            {
+                path: 'variant/:id',
+                element: <VariantDetails />,
+            },
+            {
+                path: 'product/:id',
+                element: <ProductDetail />,
+            },
+            {
+                path: 'category',
+                element: <CategoryManagement />
+            },
+            {
+                path: 'brand',
+                element: <BrandManagement />
+            },
+            {
+                path: 'color',
+                element: <ColorManagement />
+            },
+            {
+                path: 'size',
+                element: <SizeManagement />
+            },
+            {
+                path: 'order',
+                element: <OrderManagement />
+            },
+            {
+                path: 'order/:id',
+                element: <OrderDetails />
+            },
+            {
+                path: 'conservation',
+                element: <ChatPage />
+            },
+            {
+                path: 'blog',
+                element: <BlogManagement />
+            },
+            {
+                path: 'blog/create',
+                element: <CreateBlogPage />
+            },
+            {
+                path: 'blog/edit/:id',
+                element: <EditBlogPage />
+            },
+            {
+                path: 'setting/slide',
+                element: <SlideShowManagement />
+            },
+            {
+                path: 'setting/top-review',
+                element: <ReviewShowManagement />
+            },
 
-                ],
-            }
-        ]
+        ],
 
     },
     {

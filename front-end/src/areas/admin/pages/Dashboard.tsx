@@ -1,26 +1,41 @@
 import { FC, useEffect, useState } from "react";
 import CardBorder from "../components/CardBorder";
-import { DatePickerProps, Empty } from "antd";
+import { DatePickerProps, DatePicker, Empty } from "antd";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faArrowUpRightDots } from "@fortawesome/free-solid-svg-icons";
 import { OrderReport, OrderReportByMonth, ProductReport, ReportResource } from "../../../resources";
 import reportService from "../../../services/report-service";
-import { DatePicker } from "antd";
 import ReactApexChart from "react-apexcharts";
-import { formatMonthYear } from "../../../utils/format";
+import { formatCurrencyVND, formatMonthYear } from "../../../utils/format";
+
+const { RangePicker } = DatePicker;
 
 
 
 const initialValues: ReportResource = {
-    accounts: 0,
-    categories: 0,
     orders: 0,
     products: 0,
+    totalCost: 0,
+    totalRevenue: 0,
+    profit: 0,
     newestOrders: []
+}
+
+export type ReportQuery = {
+    type: '' | 'today' | 'yesterday' | 'week' | 'month';
+    from: string | null,
+    to: string | null
+}
+
+const reportInit: ReportQuery = {
+    type: '',
+    from: null,
+    to: null
 }
 
 const Dashboard: FC = () => {
     const [report, setReport] = useState<ReportResource>(initialValues)
+    const [reportQuery, setReportQuery] = useState<ReportQuery>(reportInit)
     const [topProduct, setTopProduct] = useState<ProductReport[]>([]);
     const [orders, setOrders] = useState<OrderReport[]>([])
     const [orderMonth, setOrderMonth] = useState<OrderReportByMonth[]>([])
@@ -29,12 +44,6 @@ const Dashboard: FC = () => {
 
     useEffect(() => {
 
-        const fetchReportData = async () => {
-            const response = await reportService.getReportData();
-            setReport(response.data)
-        }
-
-        fetchReportData()
         fetchTopProduct()
         fetchOrderPercent()
         fetchReporOrderByMonth()
@@ -65,21 +74,81 @@ const Dashboard: FC = () => {
         fetchReporOrderByMonth(new Date(dateString as string))
     };
 
+    useEffect(() => {
+        const fetchReportData = async (query: ReportQuery) => {
+            const response = await reportService.getReportData(query);
+            console.log(response)
+            setReport(response.data)
+        }
+
+        fetchReportData(reportQuery)
+    }, [reportQuery])
+
 
     return <div className="flex flex-col gap-6">
+        <CardBorder padding='2' className="px-4">
+            <div className="flex items-center justify-between">
+                <span className="text-lg font-semibold">Thống kê bán hàng</span>
+                <div className="flex items-center gap-x-4">
+                    <button onClick={() => {
+                        setReportQuery({
+                            ...reportQuery,
+                            type: 'today'
+                        })
+                    }} className={`bg-slate-100 px-4 py-1 rounded-md hover:text-primary hover:bg-orange-50 ${reportQuery.type === 'today' && 'text-primary bg-orange-50'}`}>Hôm nay</button>
+
+                    <button onClick={() => {
+                        setReportQuery({
+                            ...reportQuery,
+                            type: 'yesterday'
+                        })
+                    }} className={`bg-slate-100 px-4 py-1 rounded-md hover:text-primary hover:bg-orange-50 ${reportQuery.type === 'yesterday' && 'text-primary bg-orange-50'}`}>Hôm qua</button>
+
+                    <button onClick={() => {
+                        setReportQuery({
+                            ...reportQuery,
+                            type: 'week'
+                        })
+                    }} className={`bg-slate-100 px-4 py-1 rounded-md hover:text-primary hover:bg-orange-50 ${reportQuery.type === 'week' && 'text-primary bg-orange-50'}`}>7 ngày qua</button>
+
+                    <button onClick={() => {
+                        setReportQuery({
+                            ...reportQuery,
+                            type: 'month'
+                        })
+                    }} className={`bg-slate-100 px-4 py-1 rounded-md hover:text-primary hover:bg-orange-50 ${reportQuery.type === 'month' && 'text-primary bg-orange-50'}`}>Tháng này</button>
+                    |
+                    <RangePicker onChange={(values) => {
+                        if (values) {
+                            const [startDate, endDate] = values;
+                            const start = startDate!.format('YYYY-MM-DD'); 
+                            const end = endDate!.format('YYYY-MM-DD');
+                            setReportQuery({
+                                ...reportQuery,
+                                type: '',
+                                from: start,
+                                to: end
+                            })
+                        } else {
+                            console.log('No dates selected');
+                        }
+                    }} />
+                </div>
+            </div>
+        </CardBorder>
         <CardBorder>
-            <div className="grid grid-cols-3 gap-4">
-                <div className="rounded-xl p-4 bg-orange-100 flex flex-col gap-y-2">
+            <div className="grid grid-cols-4 gap-6">
+                <div className="rounded-xl px-4 py-4 bg-orange-100 flex flex-col gap-y-2">
                     <div className="flex justify-between items-center">
                         <span className="text-[14px] font-semibold">Sản phẩm</span>
                         <FontAwesomeIcon icon={faArrowUpRightDots} />
                     </div>
                     <span className="font-bold text-3xl">
-                        {report.products}
+                        {report?.products}
                     </span>
-                    <p className="text-gray-400">80% then last month</p>
+                    <p>sản phẩm đã được bán</p>
                 </div>
-                <div className="rounded-xl p-4 bg-green-100 flex flex-col gap-y-2">
+                <div className="rounded-xl px-4 py-4 bg-green-100 flex flex-col gap-y-2">
                     <div className="flex justify-between items-center">
                         <span className="text-[14px] font-semibold">Đơn hàng</span>
                         <FontAwesomeIcon icon={faArrowUpRightDots} />
@@ -87,18 +156,29 @@ const Dashboard: FC = () => {
                     <span className="font-bold text-3xl">
                         {report.orders}
                     </span>
-                    <p className="text-gray-400">80% then last month</p>
+                    <p>đơn hàng đã được đặt</p>
                 </div>
 
-                <div className="rounded-xl p-4 bg-gray-100 flex flex-col gap-y-2">
+
+                <div className="rounded-xl px-4 py-4 bg-sky-100 flex flex-col gap-y-2">
                     <div className="flex justify-between items-center">
-                        <span className="text-[14px] font-semibold">Người dùng</span>
+                        <span className="text-[14px] font-semibold">Doanh thu</span>
                         <FontAwesomeIcon icon={faArrowUpRightDots} />
                     </div>
                     <span className="font-bold text-3xl">
-                        {report.accounts}
+                        {formatCurrencyVND(report.totalRevenue)}
                     </span>
-                    <p className="text-gray-400">80% then last month</p>
+                    <p>số tiền thu về</p>
+                </div>
+                <div className="rounded-xl px-4 py-4 bg-gray-100 flex flex-col gap-y-2">
+                    <div className="flex justify-between items-center">
+                        <span className="text-[14px] font-semibold">Lợi nhuận</span>
+                        <FontAwesomeIcon icon={faArrowUpRightDots} />
+                    </div>
+                    <span className="font-bold text-3xl">
+                        {formatCurrencyVND(report.profit)}
+                    </span>
+                    <p>sau khi đã trừ chi chí</p>
                 </div>
             </div>
 

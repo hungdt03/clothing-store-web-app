@@ -2,9 +2,10 @@ import { OrderStatusType } from "../constants/OrderStatus";
 
 export type ReportResource = {
     products: number;
-    categories: number;
     orders: number;
-    accounts: number;
+    profit: number;
+    totalRevenue: number;
+    totalCost: number;
     newestOrders: OrderResource[];
 }
 

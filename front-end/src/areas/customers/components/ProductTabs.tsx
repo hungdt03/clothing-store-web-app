@@ -59,7 +59,7 @@ const ProductTabs: FC = () => {
         </div>
 
         {loading ? <GridProductSkeleton /> : <div className="grid grid-cols-4 gap-8">
-            {products.map(product => <Product key={product.id} product={product} />)}
+            {products?.map(product => <Product key={product.id} product={product} />)}
         </div>}
 
     </div>

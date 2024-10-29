@@ -1,9 +1,12 @@
+import { ReportQuery } from '../areas/admin/pages/Dashboard';
 import axiosConfig from '../configuration/axiosConfig';
 import { DataResponse, OrderReport, OrderReportByMonth, ProductReport, ReportResource } from "../resources";
 
 class ReportService {
-    getReportData() : Promise<DataResponse<ReportResource>> {
-        return axiosConfig.get("/api/Report");
+    getReportData(queryParams: ReportQuery) : Promise<DataResponse<ReportResource>> {
+        const queryString = new URLSearchParams(queryParams as any).toString();
+        console.log(queryString)
+        return axiosConfig.get("/api/Report?" + queryString);
     }
 
     getOrderPercentInRangeYear(year: number | string) : Promise<DataResponse<OrderReport[]>> {
@@ -11,7 +14,6 @@ class ReportService {
     }
 
     getOrderByMonth(month?: Date) : Promise<DataResponse<OrderReportByMonth[]>> {
-        console.log('Month: ', month?.toISOString())
         return axiosConfig.get("/api/Report/order/month?month=" + month?.toISOString());
     }
 

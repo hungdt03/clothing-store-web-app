@@ -107,7 +107,8 @@ namespace back_end.Services.Implements
                 UserName = userInfo.Email,
                 Email = userInfo.Email,
                 FullName = userInfo.Name,
-                EmailConfirmed = true
+                EmailConfirmed = true,
+                CreatedDate = DateTime.Now,
             };
 
             var createUserResult = await userManager.CreateAsync(user);
@@ -169,6 +170,7 @@ namespace back_end.Services.Implements
             newUser.Email = request.Email;  
             newUser.FullName = request.FullName;
             newUser.PhoneNumber = request.PhongNumber;
+            newUser.CreatedDate = DateTime.Now;
 
             var createResult = await userManager.CreateAsync(newUser, request.Password);
 

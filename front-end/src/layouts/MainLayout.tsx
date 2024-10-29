@@ -1,8 +1,7 @@
 import { FC, useEffect, useState } from "react";
 import { Outlet } from "react-router-dom";
-import { AppDispatch } from "../app/store";
-import { useDispatch, useSelector } from "react-redux";
-import { selectAuth, setUserDetails, signOut } from "../feature/auth/authSlice";
+import { useSelector } from "react-redux";
+import { selectAuth } from "../feature/auth/authSlice";
 import { NotificationResource, UserContactResource, UserResource } from "../resources";
 import accountService from "../services/user-service";
 import { Divider, Drawer, Empty, Flex, FloatButton, Input, Popover, Typography, notification as notificationAnt } from "antd";
@@ -16,8 +15,7 @@ import { useNotification } from "../hooks/useNotification";
 
 
 const MainLayout: FC = () => {
-    const dispatch = useDispatch<AppDispatch>();
-    const { user } = useSelector(selectAuth)
+    const { isAuthenticated, user } = useSelector(selectAuth)
     const [open, setOpen] = useState(false);
     const [adminAccounts, setAdminAccounts] = useState<UserContactResource[]>([])
     const [recipient, setRecipient] = useState<UserResource | null>(null)
@@ -30,19 +28,11 @@ const MainLayout: FC = () => {
             message: title,
             description: content,
             icon: <SmileOutlined style={{ color: '#108ee9' }} />,
+            
             placement: "bottomLeft"
         });
     };
-
-    const fetchUsers = async () => {
-        const response = await accountService.getAllAdmins();
-        setAdminAccounts(response.data);
-    }
-
-    useEffect(() => {
-        fetchUsers();
-    }, [])
-
+   
     const showDrawer = () => {
         setOpen(true);
     };
@@ -60,38 +50,28 @@ const MainLayout: FC = () => {
 
 
     useEffect(() => {
-        (async () => {
-            try {
-                const response = await accountService.getUserDetails();
-                if (!response.success) {
-                    dispatch(signOut())
-                } else {
-                    dispatch(setUserDetails(response.data))
-                }
-            } catch {
-                dispatch(signOut())
-            }
-        })()
-
         const fetchNotifications = async () => {
             const response = await notificationService.getAllNotifications();
-            if (response.statusCode === 401)
-                dispatch(signOut())
-            setNotifications(response.data)
+            if(response.success) {
+                setNotifications(response.data)
+            }  
         }
 
-        try {
+        const fetchUsers = async () => {
+            const response = await accountService.getAllAdmins();
+            setAdminAccounts(response.data);
+        }
+
+        if(isAuthenticated) {
+            fetchUsers();
             fetchNotifications()
-        } catch {
-            dispatch(signOut())
         }
-
-    }, [])
+    }, [isAuthenticated])
 
     return <>
         <Outlet />
         {contextHolder}
-        {user && <div>
+        {isAuthenticated && user && <div>
             <Popover trigger='click' placement="topRight" content={<NotificationDialog notifications={notifications} />}>
                 <FloatButton
                     badge={{

@@ -216,6 +216,7 @@ namespace back_end.Services.Implements
             product.PurchasePrice = request.PurchasePrice;
             product.BrandId = request.BrandId;
             product.CategoryId = request.CategoryId;
+            product.CreatedDate = DateTime.Now;
 
             int rows = await dbContext.SaveChangesAsync();
 

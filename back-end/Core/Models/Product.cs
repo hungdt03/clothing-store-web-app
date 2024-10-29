@@ -24,7 +24,7 @@ namespace back_end.Core.Models
         public ICollection<ProductImage>? Images { get; set; }
         public ICollection<ProductVariant> ProductVariants { get; set; }
         public ICollection<Evaluation> Evaluations { get; set; }
-
+        public DateTime? CreatedDate { get; set; } = DateTime.Now;
 
         public bool IsDeleted { get; set; } = false;
         public ICollection<Wishlist> Wishlist { get; set; }
